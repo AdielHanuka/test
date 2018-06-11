@@ -1,0 +1,105 @@
+#ifdef _DEBUG
+#pragma comment(lib, "sfml-main-d.lib")
+#elif defined(NDEBUG)
+#pragma comment(lib, "sfml-main.lib")
+#else
+#error "Unrecognized configuration!"
+#endif
+
+#include <SFML/Graphics.hpp>
+#include <cassert>
+#include <iostream>
+#include <fstream>
+#include <math.h>
+#include <string>
+#include <random>
+#include <time.h>
+
+using namespace std;
+using std::ofstream;
+using std::max;
+
+int main()
+{
+	int y = 300;
+	int x = 300;
+	char direction = 'S';
+	sf::RenderWindow window(sf::VideoMode(600, 600), "Pong");
+	sf::Clock clock;
+	int lastMili = 0;
+	int currentMili = 0;
+	int pixelPerSecond = 100;
+
+	float factor = 1;
+	while (window.isOpen())
+	{
+
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)//Closed
+				window.close();
+
+			if (event.type == sf::Event::KeyPressed)//KeyPressed
+				switch (event.key.code)
+				{
+				case sf::Keyboard::Escape:
+					window.close();
+					break;
+				case sf::Keyboard::Space:
+					direction = 'S';
+					break;
+				case sf::Keyboard::Right:
+					direction = 'R';
+					break;
+				case sf::Keyboard::Left:
+					direction = 'L';
+					break;
+				case sf::Keyboard::Up:
+					direction = 'U';
+					break;
+				case sf::Keyboard::Down:
+					direction = 'D';
+					break;
+				}
+		}
+
+		currentMili = clock.getElapsedTime().asMilliseconds();
+		if (currentMili - lastMili > (1000 / ((float)pixelPerSecond * factor))) {
+			switch (direction)
+			{
+			case 'R':
+				x++;
+				break;
+			case 'L':
+				x--;
+				break;
+			case 'U':
+				y--;
+				break;
+			case 'D':
+				y++;
+				break;
+			}
+
+			lastMili = currentMili;
+		}
+		window.clear();
+
+		sf::Texture tex;
+		sf::Sprite cartoon;
+
+		string out_walls = "pacman.png";
+
+		assert(tex.loadFromFile(out_walls));
+
+		cartoon.setTexture(tex);
+		cartoon.setPosition(x, y);
+
+		window.draw(cartoon);
+
+		window.display();
+	}
+
+	return 0;
+}
